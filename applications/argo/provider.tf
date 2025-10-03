@@ -1,10 +1,11 @@
+
 terraform {
   required_version = ">= 1.6.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.0.0, < 7.0.0"
+      version = "~> 5.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -19,7 +20,7 @@ terraform {
   # backend (옵션: S3 + DynamoDB로 state 관리 시)
   backend "s3" {
     bucket         = "jinyoung-project-quantitative-terraform"
-    key            = "quantitative/eks/terraform.tfstate"
+    key            = "quantitative/eks/application/argo/terraform.tfstate"
     region         = "ap-northeast-2"
     encrypt        = true
   }
@@ -27,4 +28,14 @@ terraform {
 
 provider "aws" {
   region = "ap-northeast-2"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
+
+provider "kubernetes" {
+  config_path = "~/.kube/config"
 }

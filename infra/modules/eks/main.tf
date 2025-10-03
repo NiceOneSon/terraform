@@ -1,17 +1,41 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.8.5"
+  version = "~> 21.0" 
 
-  cluster_name    = "eks-dev"
-  cluster_version = "1.31"
+  name    = "eks-dev"
+  kubernetes_version = "1.31"
 
   vpc_id     = var.vpc_id
   subnet_ids = var.subnet_ids
+  enabled_log_types = []
 
-  cluster_endpoint_public_access = true
+  endpoint_public_access = true
   enable_irsa                    = true
 
-  cluster_enabled_log_types = []
   create_cloudwatch_log_group     = false
   cloudwatch_log_group_retention_in_days = 0
+
+  enable_cluster_creator_admin_permissions= true
+
+  access_entries = {
+    admin = {
+      principal_arn = local.admin_role_arn
+      policy_associations = {
+        admin = {
+          policy_arn  = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = { type = "cluster" }
+        }
+      }
+    }
+  }
+  eks_managed_node_groups = {
+    default = {
+      instance_types = ["t3.medium"]
+      desired_size   = 1
+      min_size       = 1
+      max_size       = 1
+    }
+  }
+
+
 }

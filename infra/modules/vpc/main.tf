@@ -9,6 +9,7 @@ module "vpc" {
   azs = ["ap-northeast-2a", "ap-northeast-2c"]
   
   enable_nat_gateway = false
+  map_public_ip_on_launch = true
 
   tags = {
     Environment = "dev"
