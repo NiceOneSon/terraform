@@ -1,9 +1,15 @@
+resource "kubernetes_namespace" "argocd" {
+  metadata {
+    name = "argocd"
+  }
+}
+
 resource "helm_release" "argocd" {
+  depends_on = [ kubernetes_namespace.argocd ]
   name       = "argocd"
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
   namespace  = "argocd"
-  create_namespace = true
 
   values = [
     file("yaml/argocd-values.yaml")
@@ -11,6 +17,7 @@ resource "helm_release" "argocd" {
 }
 
 resource "kubernetes_secret" "argocd_github" {
+  depends_on = [ kubernetes_namespace.argocd ]
   metadata {
     name      = "argocd-github-cred"
     namespace = "argocd"
@@ -25,6 +32,7 @@ resource "kubernetes_secret" "argocd_github" {
 }
 
 resource "kubernetes_secret" "argocd_ssh_key" {
+  depends_on = [ kubernetes_namespace.argocd ]
   metadata {
     name      = "argocd-ssh-key"
     namespace = "argocd"
@@ -35,4 +43,14 @@ resource "kubernetes_secret" "argocd_ssh_key" {
   }
 
   type = "Opaque"
+}
+
+resource "kubernetes_manifest" "argocd_gateway" {
+  depends_on = [ kubernetes_namespace.argocd ]
+  manifest = yamldecode(file("yaml/argocd-gateway.yaml"))
+}
+
+resource "kubernetes_manifest" "argocd_virtualservice" {
+  depends_on = [ kubernetes_namespace.argocd ]
+  manifest = yamldecode(file("yaml/argocd-virtualservice.yaml"))
 }
