@@ -17,6 +17,17 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions= true
 
+  addons = {
+    coredns                = {}
+    eks-pod-identity-agent = {
+      before_compute = true
+    }
+    kube-proxy             = {}
+    vpc-cni                = {
+      before_compute = true
+    }
+  }
+
   access_entries = {
     admin = {
       principal_arn = local.admin_role_arn
@@ -30,6 +41,7 @@ module "eks" {
   }
   eks_managed_node_groups = {
     default = {
+      name = "default"
       instance_types = ["t3.medium"]
       desired_size   = 1
       min_size       = 1
