@@ -1,10 +1,20 @@
+resource "kubernetes_namespace" "istio_system" {
+  metadata {
+    name = "istio-system"
+    labels = {
+      istio-injection = "disabled"
+    }
+  }
+}
+
 resource "helm_release" "istio_base" {
+  depends_on = [kubernetes_namespace.istio_system]
+
   name       = "istio-base"
   repository = "https://istio-release.storage.googleapis.com/charts"
   chart      = "base"
   version    = "1.27.1"
   namespace  = "istio-system"
-  create_namespace = true
 }
 
 resource "helm_release" "istiod" {
@@ -21,6 +31,7 @@ resource "helm_release" "istiod" {
     value = "/dev/stdout"
   }
 }
+
 resource "helm_release" "istio_ingress" {
   depends_on = [helm_release.istiod]
   
