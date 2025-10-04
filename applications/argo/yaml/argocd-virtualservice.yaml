@@ -5,15 +5,16 @@ metadata:
   namespace: argocd
 spec:
   hosts:
-  - "*"
+    - "*"
   gateways:
-  - argocd-gateway
+    - argocd-gateway
   http:
-  - match:
-    - uri:
+    - name: "argocd-routes"
+      match:
+      - uri:
         prefix: /argocd
-    route:
-    - destination:
-        host: argocd-server.argocd.svc.cluster.local
-        port:
-          number: 80
+      route:
+      - destination:
+          host: argocd-server.argocd.svc.cluster.local
+          port:
+            number: 80
